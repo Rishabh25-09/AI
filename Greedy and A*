@@ -1,0 +1,68 @@
+
+import heapq
+
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('D', 2)],
+    'C': [('D', 1), ('E', 5)],
+    'D': [('E', 3)],
+    'E': []
+}
+
+h = {'A': 4, 'B': 3, 'C': 4, 'D': 2, 'E': 0}
+
+
+# GREEDY BEST FIRST SEARCH
+def greedy(start, goal):
+    pq = [(h[start], start, [start])]
+    visited = set()
+
+    while pq:
+        _, node, path = heapq.heappop(pq)
+
+        if node == goal:
+            print("Greedy Path:", path)
+            return
+
+        if node in visited:
+            continue
+
+        visited.add(node)
+
+        for neighbour, cost in graph[node]:
+            if neighbour not in visited:
+                heapq.heappush(pq, (h[neighbour], neighbour, path + [neighbour]))
+
+    print("Path not found")
+
+
+# A STAR SEARCH
+def astar(start, goal):
+    pq = [(h[start], 0, start, [start])]
+    best = {start: 0}
+
+    while pq:
+        f, g, node, path = heapq.heappop(pq)
+
+        if g != best[node]:
+            continue
+
+        if node == goal:
+            print("A* Path:", path)
+            print("Total Cost:", g)
+            return
+
+        for neighbour, cost in graph[node]:
+            new_cost = g + cost
+
+            if new_cost < best.get(neighbour, float('inf')):
+                best[neighbour] = new_cost
+                heapq.heappush(pq, (new_cost + h[neighbour],
+                                    new_cost, neighbour,
+                                    path + [neighbour]))
+
+    print("Path not found")
+
+
+greedy('A', 'E')
+astar('A', 'E')
