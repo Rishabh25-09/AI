@@ -1,0 +1,111 @@
+
+board = [' '] * 9
+
+# Check winner
+def check(player):
+    wins = [
+        (0,1,2), (3,4,5), (6,7,8),
+        (0,3,6), (1,4,7), (2,5,8),
+        (0,4,8), (2,4,6)
+    ]
+
+    for a,b,c in wins:
+        if board[a] == board[b] == board[c] == player:
+            return True
+    return False
+
+
+# Minimax algorithm
+def minimax(maximizing):
+
+    if check('O'):
+        return 1
+    if check('X'):
+        return -1
+    if ' ' not in board:
+        return 0
+
+    if maximizing:
+        best = -2
+
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'O'
+                score = minimax(False)
+                board[i] = ' '
+                best = max(best, score)
+
+        return best
+
+    else:
+        best = 2
+
+        for i in range(9):
+            if board[i] == ' ':
+                board[i] = 'X'
+                score = minimax(True)
+                board[i] = ' '
+                best = min(best, score)
+
+        return best
+
+
+# AI chooses its move
+def ai_move():
+    best = -2
+    move = None
+
+    for i in range(9):
+        if board[i] == ' ':
+            board[i] = 'O'
+            score = minimax(False)
+            board[i] = ' '
+
+            if score > best:
+                best = score
+                move = i
+
+    if move is not None:
+        board[move] = 'O'
+
+
+# Display board
+def display():
+    for i in range(0, 9, 3):
+        print(board[i], '|', board[i+1], '|', board[i+2])
+        print("---------")
+
+
+# Play game
+while True:
+
+    display()
+    move = int(input("Enter position (1-9): ")) - 1
+
+    if move < 0 or move > 8 or board[move] != ' ':
+        print("Invalid move")
+        continue
+
+    board[move] = 'X'
+
+    if check('X'):
+        display()
+        print("Human Wins!")
+        break
+
+    if ' ' not in board:
+        display()
+        print("Draw!")
+        break
+
+    ai_move()
+
+    if check('O'):
+        display()
+        print("AI Wins!")
+        break
+
+    if ' ' not in board:
+        display()
+        print("Draw!")
+        break
