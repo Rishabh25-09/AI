@@ -1,35 +1,41 @@
-
 from collections import deque
 
-def water_jug(a, b, target):
 
-    queue = deque([(0, 0)])
-    visited = set()
+def water_jug_exact(a, b, goal):
+    gx, gy = goal
+    if gx < 0 or gx > a or gy < 0 or gy > b:
+        print("No sol exists")
+        return
+
+    queue = deque([((0, 0), [(0, 0)])])
+    visited = {(0, 0)}
 
     while queue:
+        (x, y), path = queue.popleft()
 
-        x, y = queue.popleft()
-
-        if x == target or y == target:
-            print("Solution Found:", x, y)
+        if (x, y) == goal:
+            print(f"Reached {goal} in {len(path) - 1} steps:")
+            print(" -> ".join(str(s) for s in path))
             return
 
-        if (x, y) in visited:
-            continue
+        pour_a_to_b = min(x, b - y)
+        pour_b_to_a = min(y, a - x)
 
-        visited.add((x, y))
-
-        states = [
-            (a, y), (x, b),
-            (0, y), (x, 0),
-            (x - min(x, b-y), y + min(x, b-y)),
-            (x + min(y, a-x), y - min(y, a-x))
+        next_states = [
+            (a, y),
+            (x, b),
+            (0, y),
+            (x, 0),
+            (x - pour_a_to_b, y + pour_a_to_b),
+            (x + pour_b_to_a, y - pour_b_to_a),
         ]
 
-        for state in states:
+        for state in next_states:
             if state not in visited:
-                queue.append(state)
+                visited.add(state)
+                queue.append((state, path + [state]))
 
-    print("No solution exists")
+    print("No sol exists")
 
-water_jug(4, 3, 2)
+
+water_jug_exact(4, 3, (2, 0))
